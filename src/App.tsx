@@ -32,8 +32,8 @@ const App: React.VFC = () => {
 
   const newGame = () => {
     setGameState('reset')
-    setMinesMap(createGame(columns, rows, mines))
-    setGameState('running')
+    //setMinesMap(createGame(columns, rows, mines))
+    //setGameState('running')
   }
 
   useEffect(() => {

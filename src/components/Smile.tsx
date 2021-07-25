@@ -8,11 +8,11 @@ interface SmileProps {
 
 const Smile: React.VFC<SmileProps> = ({onClick, gameState}) => {
     const [className, setClassName] = useState('')
-    console.log(gameState)
+    console.log(gameState, className)
     useEffect(() => {
         switch (gameState) {
             case 'suspended':
-                setClassName('smmile_o')
+                setClassName('smile_o')
                 break
             case 'ended':
                 setClassName('smile_x')
@@ -21,6 +21,7 @@ const Smile: React.VFC<SmileProps> = ({onClick, gameState}) => {
                 setClassName('')
                 break
         }
+        console.log("useEffect")
     }, [gameState])
 
     return (
