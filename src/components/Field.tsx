@@ -1,69 +1,51 @@
-import React from 'react'
-import {range} from 'lodash'
+import React, { useMemo } from 'react'
+import { range } from 'lodash'
 import Spot from './Spot'
-import {GameState} from "../App";
+import { GameState } from '../App'
+import { countMines } from '../lib/utils'
 
 interface FieldProps {
-    rows: number
-    columns: number
-    minesMap: boolean[][] | undefined
-    setGameState: (gameState: GameState) => void
-    gameState: GameState
+  rows: number
+  columns: number
+  minesMap: boolean[][] | undefined
+  setGameState: (gameState: GameState) => void
+  gameState: GameState
 }
 
-const Field: React.VFC<FieldProps> = ({rows, columns, minesMap, setGameState, gameState}) => {
+const Field: React.VFC<FieldProps> = ({ rows, columns, minesMap, setGameState, gameState }) => {
+  const cleanGameState = (gs: GameState) => {
+    return gs === 'suspended' ? 'running' : gs
+  }
 
-    const countMines = (x: number, y: number, columns: number, rows: number) => {
-        if (!minesMap) return 0
-        let n = 0;
-        if (y > 0) {
-            if (x > 0) {
-                n += minesMap[y - 1][x - 1] ? 1 : 0;
-            }
-            n += minesMap[y - 1][x] ? 1 : 0;
-            if (x < columns - 1) {
-                n += minesMap[y - 1][x + 1] ? 1 : 0;
-            }
-        }
-        if (x > 0) {
-            n += minesMap[y][x - 1] ? 1 : 0;
-        }
-        if (x < columns - 1) {
-            n += minesMap[y][x + 1] ? 1 : 0;
-        }
-        if (y < rows - 1) {
-            if (x > 0) {
-                n += minesMap[y + 1][x - 1] ? 1 : 0;
-            }
-            n += minesMap[y + 1][x] ? 1 : 0;
-            if (x < columns - 1) {
-                n += minesMap[y + 1][x + 1] ? 1 : 0;
-            }
-        }
-        return n;
-    }
-
-    if (!minesMap) return <div>Preparazione in corso...</div>
-    return (
+  return useMemo(
+    () =>
+      !minesMap ? (
+        <div style={{ height: '100px' }}> </div>
+      ) : (
         <table id="mines" cellSpacing="0" cellPadding="0">
-            <tbody>
+          <tbody>
             {range(0, rows).map((row, i) => (
-                <tr key={i}>
-                    {range(0, columns).map((col, j) => {
-                        const hasBomb = minesMap ? minesMap[row][col] : false
-                        const minesCount = (!hasBomb && minesMap) ? countMines(col, row, columns, rows) : 0
-                        return <Spot key={j}
-                              hasBomb={minesMap ? minesMap[row][col] : false}
-                              setGameState={setGameState}
-                              gameState={gameState}
-                                     minesCount={minesCount}
-                        />
-                    })}
-                </tr>
+              <tr key={i}>
+                {range(0, columns).map((col, j) => {
+                  const hasBomb = minesMap ? minesMap[row][col] : false
+                  const minesCount = !hasBomb && minesMap ? countMines(minesMap, col, row, columns, rows) : 0
+                  return (
+                    <Spot
+                      key={`spot-${j}`}
+                      hasBomb={hasBomb}
+                      setGameState={setGameState}
+                      gameState={cleanGameState(gameState)}
+                      minesCount={minesCount}
+                    />
+                  )
+                })}
+              </tr>
             ))}
-            </tbody>
+          </tbody>
         </table>
-    )
+      ),
+    [gameState, minesMap]
+  )
 }
 
-export default React.memo(Field)
+export default Field

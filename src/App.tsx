@@ -1,25 +1,8 @@
-import { range } from 'lodash'
-import React, { useEffect, useState } from 'react'
+import React, { useCallback, useEffect, useState } from 'react'
 import Field from './components/Field'
 import Smile from './components/Smile'
-
-function createGame(columns: number, rows: number, mines: number) {
-  let minesMap = range(0, rows).map((row) => range(0, columns).map((col) => false))
-
-  for (let i = 0; i < mines; i++) {
-    const x = Math.round(Math.random() * (columns - 1))
-    const y = Math.round(Math.random() * (rows - 1))
-
-    // console.log(`x: ${x}, y: ${y}, rows: ${rows}, columns: ${columns}`)
-
-    if (!minesMap[y][x]) {
-      minesMap[y][x] = true
-    } else {
-      i--
-    }
-  }
-  return minesMap
-}
+import { createGame } from './lib/utils'
+import useStatePromise from 'use-state-promise'
 
 export type GameState = 'running' | 'suspended' | 'ended' | 'reset'
 
@@ -27,18 +10,22 @@ const App: React.VFC = () => {
   const [rows, setRows] = useState(16)
   const [columns, setColumns] = useState(30)
   const [mines, setMines] = useState(90)
-  const [minesMap, setMinesMap] = useState<boolean[][]>()
-  const [gameState, setGameState] = useState<GameState>('running')
+  const [minesMap, setMinesMapPromise, setMinesMap] = useStatePromise<boolean[][]>()
+  const [gameState, setGameStatePromise, setGameState] = useStatePromise<GameState>('running')
 
-  const newGame = () => {
-    setGameState('reset')
-    //setMinesMap(createGame(columns, rows, mines))
-    //setGameState('running')
-  }
+  const newGame = useCallback(() => {
+    setGameStatePromise('reset')
+      .then(() => {
+        return setMinesMapPromise(createGame(columns, rows, mines))
+      })
+      .then(() => {
+        setGameState('running')
+      })
+  }, [columns, mines, rows, setGameState, setGameStatePromise, setMinesMapPromise])
 
   useEffect(() => {
     setMinesMap(createGame(columns, rows, mines))
-  }, [columns, mines, rows])
+  }, [columns, mines, rows, setMinesMap])
 
   return (
     <>
