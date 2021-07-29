@@ -1,10 +1,9 @@
 import React, { useMemo } from 'react'
 import Spot from './Spot'
 import { useSelector } from 'react-redux'
-import { getGameStateSelector, getSpotMapSelector } from '../store/game.selectors'
+import { getSpotMapSelector } from '../store/game.selectors'
 
 const Field: React.VFC = () => {
-  const gameState = useSelector(getGameStateSelector)
   const spotMap = useSelector(getSpotMapSelector)
 
   return useMemo(
@@ -24,7 +23,7 @@ const Field: React.VFC = () => {
           </tbody>
         </table>
       ),
-    [gameState, spotMap]
+    [spotMap]
   )
 }
 

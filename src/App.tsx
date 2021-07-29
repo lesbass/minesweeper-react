@@ -7,11 +7,10 @@ import { createGame, setGameState } from './store/game.actions'
 
 const App: React.VFC = () => {
   const dispatch = useDispatch() as AppDispatch
-
   useEffect(() => {
     dispatch(createGame())
     dispatch(setGameState('running'))
-  }, [])
+  }, [dispatch])
 
   return (
     <>

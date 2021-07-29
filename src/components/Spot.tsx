@@ -36,7 +36,7 @@ const Spot: React.VFC<{ data: SpotData }> = ({ data }) => {
     }
   }, [className, hasBomb, isRunning, isValid])*/
 
-  const { leftSuspendStart, leftSuspendEnd, onClick } = useCallback(
+  const { leftSuspendStart, leftSuspendEnd } = useCallback(
     () =>
       gameState !== 'ended'
         ? {
@@ -71,7 +71,7 @@ const Spot: React.VFC<{ data: SpotData }> = ({ data }) => {
             leftSuspendEnd: () => {},
             onClick: () => {},
           },
-    [gameState]
+    [className, dispatch, gameState]
   )()
   return useMemo(() => {
     console.log('render')
@@ -84,7 +84,7 @@ const Spot: React.VFC<{ data: SpotData }> = ({ data }) => {
         //onClick={onClick}
       />
     )
-  }, [className])
+  }, [className, leftSuspendStart, leftSuspendEnd])
 }
 
 export default Spot
