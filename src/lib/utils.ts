@@ -1,7 +1,7 @@
 import { range } from 'lodash'
 
-export function createGame(columns: number, rows: number, mines: number) {
-  let minesMap = range(0, rows).map((row) => range(0, columns).map((col) => false))
+export function createNewGame(columns: number, rows: number, mines: number) {
+  let minesMap = range(0, rows).map(() => range(0, columns).map(() => false))
 
   for (let i = 0; i < mines; i++) {
     const x = Math.round(Math.random() * (columns - 1))
@@ -15,7 +15,16 @@ export function createGame(columns: number, rows: number, mines: number) {
       i--
     }
   }
-  return minesMap
+  return minesMap.map((row, y) =>
+    row.map((cell, x) => {
+      return {
+        hasBomb: cell,
+        state: 'hidden',
+        row: y,
+        column: x,
+      }
+    })
+  ) as SpotMap
 }
 
 export function countMines(minesMap: boolean[][], x: number, y: number, columns: number, rows: number) {
@@ -47,3 +56,13 @@ export function countMines(minesMap: boolean[][], x: number, y: number, columns:
   }
   return n
 }
+
+export type SpotMap = SpotData[][]
+export interface SpotData {
+  hasBomb: boolean
+  state: SpotState
+  row: number
+  column: number
+}
+export type SpotState = 'hidden' | 'empty' | 'showBomb' | 'firedBomb' | 'flag'
+export type GameState = 'running' | 'suspended' | 'ended' | 'reset'

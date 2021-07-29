@@ -1,19 +1,18 @@
-import React, { useEffect, useMemo, useState } from 'react'
-import { GameState } from '../App'
+import React, { useCallback, useMemo, useState } from 'react'
+import { SpotData } from '../lib/utils'
+import { useDispatch, useSelector } from 'react-redux'
+import { getGameStateSelector } from '../store/game.selectors'
+import { AppDispatch } from '../index'
+import { setGameState } from '../store/game.actions'
 
-interface SpotProps {
-  hasBomb: boolean
-  setGameState: (gameState: GameState) => void
-  gameState: GameState
-  minesCount: number
-}
+const Spot: React.VFC<{ data: SpotData }> = ({ data }) => {
+  const dispatch = useDispatch() as AppDispatch
 
-const Spot: React.VFC<SpotProps> = ({ hasBomb, setGameState, gameState, minesCount }) => {
+  const gameState = useSelector(getGameStateSelector)
   const [className, setClassName] = useState<string[]>([])
-  const [isValid, setIsValid] = useState(true)
-  const isRunning = gameState === 'running' || gameState === 'suspended'
+  //const isRunning = gameState === 'running' || gameState === 'suspended'
 
-  useEffect(() => {
+  /*useEffect(() => {
     switch (gameState) {
       case 'ended':
         if (!isValid) return
@@ -35,46 +34,54 @@ const Spot: React.VFC<SpotProps> = ({ hasBomb, setGameState, gameState, minesCou
         setIsValid(true)
         break
     }
-  }, [className, hasBomb, isRunning, isValid])
+  }, [className, hasBomb, isRunning, isValid])*/
 
-  const leftSuspendStart = () => {
-    if (gameState === 'ended' || !isValid) return
-    if (!!className.filter((cn) => cn === 'clicked' || cn === 'flag').length) return
-    setGameState('suspended')
-    setClassName(['empty'])
-  }
-
-  const leftSuspendEnd = () => {
-    if (gameState === 'ended' || !isValid) return
-    if (!!className.filter((cn) => cn === 'clicked' || cn === 'flag').length) return
-    setGameState('running')
-    setClassName([])
-  }
-
-  const onClick = () => {
-    if (gameState === 'ended' || !isValid) return
-    if (gameState !== 'running') setGameState('running')
-    setClassName(['clicked'])
-    if (hasBomb) {
-      setIsValid(false)
-      setClassName([...className, 'flower_red'])
-      setGameState('ended')
-    } else {
-      setIsValid(false)
-      const newClasses = ['empty']
-      minesCount > 0 && newClasses.push(`count_${minesCount}`)
-      setClassName([...className, ...newClasses])
-    }
-  }
+  const { leftSuspendStart, leftSuspendEnd, onClick } = useCallback(
+    () =>
+      gameState !== 'ended'
+        ? {
+            leftSuspendStart: () => {
+              if (!!className.filter((cn) => cn === 'clicked' || cn === 'flag').length) return
+              dispatch(setGameState('suspended'))
+              setClassName(['empty'])
+            },
+            leftSuspendEnd: (onlyIfSuspended: boolean) => {
+              if (onlyIfSuspended && gameState !== 'suspended') return
+              if (!!className.filter((cn) => cn === 'clicked' || cn === 'flag').length) return
+              dispatch(setGameState('running'))
+              setClassName([])
+            },
+            onClick: () => {
+              if (gameState !== 'running') dispatch(setGameState('running'))
+              setClassName(['clicked'])
+              /*if (hasBomb) {
+            setIsValid(false)
+            setClassName([...className, 'flower_red'])
+            setGameState('ended')
+          } else {
+            setIsValid(false)
+            const newClasses = ['empty']
+            minesCount > 0 && newClasses.push(`count_${minesCount}`)
+            setClassName([...className, ...newClasses])
+          }*/
+            },
+          }
+        : {
+            leftSuspendStart: () => {},
+            leftSuspendEnd: () => {},
+            onClick: () => {},
+          },
+    [gameState]
+  )()
   return useMemo(() => {
     console.log('render')
     return (
       <td
         className={className.join(' ')}
         onMouseDown={leftSuspendStart}
-        onMouseUp={leftSuspendEnd}
-        onMouseOut={leftSuspendEnd}
-        onClick={onClick}
+        onMouseUp={() => leftSuspendEnd(false)}
+        onMouseOut={() => leftSuspendEnd(true)}
+        //onClick={onClick}
       />
     )
   }, [className])

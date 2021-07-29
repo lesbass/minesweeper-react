@@ -1,12 +1,14 @@
 import React, { useEffect, useState } from 'react'
-import { GameState } from '../App'
+import { useDispatch, useSelector } from 'react-redux'
+import { getGameStateSelector } from '../store/game.selectors'
+import { AppDispatch } from '../index'
+import { createGame } from '../store/game.actions'
 
-interface SmileProps {
-  onClick: () => void
-  gameState: GameState
-}
+const Smile: React.VFC = () => {
+  const dispatch = useDispatch() as AppDispatch
 
-const Smile: React.VFC<SmileProps> = ({ onClick, gameState }) => {
+  const gameState = useSelector(getGameStateSelector)
+
   const [className, setClassName] = useState('')
   console.log(gameState, className)
   useEffect(() => {
@@ -31,7 +33,7 @@ const Smile: React.VFC<SmileProps> = ({ onClick, gameState }) => {
       onMouseDown={() => setClassName('smileDown')}
       onMouseUp={() => setClassName('')}
       onMouseOut={() => setClassName('')}
-      onClick={onClick}
+      onClick={() => dispatch(createGame())}
     />
   )
 }

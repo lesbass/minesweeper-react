@@ -1,39 +1,25 @@
-import React, { useCallback, useEffect, useState } from 'react'
+import React, { useEffect } from 'react'
 import Field from './components/Field'
 import Smile from './components/Smile'
-import { createGame } from './lib/utils'
-import useStatePromise from 'use-state-promise'
-
-export type GameState = 'running' | 'suspended' | 'ended' | 'reset'
+import { useDispatch } from 'react-redux'
+import { AppDispatch } from './index'
+import { createGame, setGameState } from './store/game.actions'
 
 const App: React.VFC = () => {
-  const [rows, setRows] = useState(16)
-  const [columns, setColumns] = useState(30)
-  const [mines, setMines] = useState(90)
-  const [minesMap, setMinesMapPromise, setMinesMap] = useStatePromise<boolean[][]>()
-  const [gameState, setGameStatePromise, setGameState] = useStatePromise<GameState>('running')
-
-  const newGame = useCallback(() => {
-    setGameStatePromise('reset')
-      .then(() => {
-        return setMinesMapPromise(createGame(columns, rows, mines))
-      })
-      .then(() => {
-        setGameState('running')
-      })
-  }, [columns, mines, rows, setGameState, setGameStatePromise, setMinesMapPromise])
+  const dispatch = useDispatch() as AppDispatch
 
   useEffect(() => {
-    setMinesMap(createGame(columns, rows, mines))
-  }, [columns, mines, rows, setMinesMap])
+    dispatch(createGame())
+    dispatch(setGameState('running'))
+  }, [])
 
   return (
     <>
       <div id="console">
         <div id="menu">
-          <Smile onClick={newGame} gameState={gameState} />
+          <Smile />
         </div>
-        <Field rows={rows} columns={columns} minesMap={minesMap} setGameState={setGameState} gameState={gameState} />
+        <Field />
       </div>
     </>
   )
