@@ -18,10 +18,10 @@ export function createNewGame(columns: number, rows: number, mines: number) {
   return minesMap.map((row, y) =>
     row.map((cell, x) => {
       return {
-        hasBomb: cell,
-        state: 'hidden',
-        row: y,
         column: x,
+        hasBomb: cell,
+        row: y,
+        state: 'hidden',
       }
     })
   ) as SpotMap
@@ -59,10 +59,10 @@ export function countMines(minesMap: boolean[][], x: number, y: number, columns:
 
 export type SpotMap = SpotData[][]
 export interface SpotData {
-  hasBomb: boolean
-  state: SpotState
-  row: number
   column: number
+  hasBomb: boolean
+  row: number
+  state: SpotState
 }
 export type SpotState = 'hidden' | 'empty' | 'showBomb' | 'firedBomb' | 'flag'
 export type GameState = 'running' | 'suspended' | 'ended' | 'reset'

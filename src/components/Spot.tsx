@@ -1,11 +1,12 @@
 import React, { useCallback, useMemo, useState } from 'react'
-import { SpotData } from 'lib/utils'
 import { useDispatch, useSelector } from 'react-redux'
-import { getGameStateSelector } from 'store/game.selectors'
-import { AppDispatch } from 'index'
-import { setGameState } from 'store/game.actions'
 
-const Spot: React.VFC<{ data: SpotData }> = ({ data }) => {
+import { AppDispatch } from 'index'
+import { SpotData } from 'lib/utils'
+import { setGameState } from 'store/game.actions'
+import { getGameStateSelector } from 'store/game.selectors'
+
+const Spot: React.VFC<SpotData> = (data) => {
   const dispatch = useDispatch() as AppDispatch
 
   const gameState = useSelector(getGameStateSelector)
@@ -36,25 +37,26 @@ const Spot: React.VFC<{ data: SpotData }> = ({ data }) => {
     }
   }, [className, hasBomb, isRunning, isValid])*/
 
-  const { leftSuspendStart, leftSuspendEnd } = useCallback(
+  const { leftSuspendEnd, leftSuspendStart } = useCallback(
     () =>
       gameState !== 'ended'
         ? {
-            leftSuspendStart: () => {
-              if (!!className.filter((cn) => cn === 'clicked' || cn === 'flag').length) return
-              dispatch(setGameState('suspended'))
-              setClassName(['empty'])
-            },
             leftSuspendEnd: (onlyIfSuspended: boolean) => {
               if (onlyIfSuspended && gameState !== 'suspended') return
               if (!!className.filter((cn) => cn === 'clicked' || cn === 'flag').length) return
               dispatch(setGameState('running'))
               setClassName([])
             },
+            leftSuspendStart: () => {
+              if (!!className.filter((cn) => cn === 'clicked' || cn === 'flag').length) return
+              dispatch(setGameState('suspended'))
+              setClassName(['empty'])
+            },
             onClick: () => {
               if (gameState !== 'running') dispatch(setGameState('running'))
               setClassName(['clicked'])
-              /*if (hasBomb) {
+            },
+            /*if (hasBomb) {
             setIsValid(false)
             setClassName([...className, 'flower_red'])
             setGameState('ended')
@@ -64,23 +66,23 @@ const Spot: React.VFC<{ data: SpotData }> = ({ data }) => {
             minesCount > 0 && newClasses.push(`count_${minesCount}`)
             setClassName([...className, ...newClasses])
           }*/
-            },
           }
         : {
-            leftSuspendStart: () => {},
             leftSuspendEnd: () => {},
+            leftSuspendStart: () => {},
             onClick: () => {},
           },
     [className, dispatch, gameState]
   )()
+
   return useMemo(() => {
     console.log('render')
     return (
       <td
         className={className.join(' ')}
         onMouseDown={leftSuspendStart}
-        onMouseUp={() => leftSuspendEnd(false)}
         onMouseOut={() => leftSuspendEnd(true)}
+        onMouseUp={() => leftSuspendEnd(false)}
         //onClick={onClick}
       />
     )

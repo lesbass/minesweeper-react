@@ -1,9 +1,10 @@
 import React, { useEffect } from 'react'
-import Field from './components/Field'
-import Smile from './components/Smile'
 import { useDispatch } from 'react-redux'
-import { AppDispatch } from './index'
-import { createGame, setGameState } from './store/game.actions'
+
+import Field from 'components/Field'
+import Smile from 'components/Smile'
+import { AppDispatch } from 'index'
+import { createGame, setGameState } from 'store/game.actions'
 
 const App: React.VFC = () => {
   const dispatch = useDispatch() as AppDispatch

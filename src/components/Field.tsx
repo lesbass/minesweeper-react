@@ -1,7 +1,9 @@
 import React, { useMemo } from 'react'
-import Spot from './Spot'
 import { useSelector } from 'react-redux'
+
 import { getSpotMapSelector } from 'store/game.selectors'
+
+import Spot from './Spot'
 
 const Field: React.VFC = () => {
   const spotMap = useSelector(getSpotMapSelector)
@@ -11,12 +13,12 @@ const Field: React.VFC = () => {
       !spotMap.length ? (
         <div style={{ padding: '100px', textAlign: 'center' }}>{'Avvio in corso...'}</div>
       ) : (
-        <table id="mines" cellSpacing="0" cellPadding="0">
+        <table cellPadding="0" cellSpacing="0" id="mines">
           <tbody>
             {spotMap.map((row, i) => (
               <tr key={i}>
                 {row.map((spot, j) => {
-                  return <Spot key={`spot-${j}`} data={spot} />
+                  return <Spot key={`spot-${j}`} {...spot} />
                 })}
               </tr>
             ))}

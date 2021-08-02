@@ -1,8 +1,9 @@
 import React, { useEffect, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
-import { getGameStateSelector } from 'store/game.selectors'
+
 import { AppDispatch } from 'index'
 import { createGame } from 'store/game.actions'
+import { getGameStateSelector } from 'store/game.selectors'
 
 const Smile: React.VFC = () => {
   const dispatch = useDispatch() as AppDispatch
@@ -28,12 +29,12 @@ const Smile: React.VFC = () => {
 
   return (
     <div
-      id={'smile'}
       className={className}
-      onMouseDown={() => setClassName('smileDown')}
-      onMouseUp={() => setClassName('')}
-      onMouseOut={() => setClassName('')}
+      id={'smile'}
       onClick={() => dispatch(createGame())}
+      onMouseDown={() => setClassName('smileDown')}
+      onMouseOut={() => setClassName('')}
+      onMouseUp={() => setClassName('')}
     />
   )
 }

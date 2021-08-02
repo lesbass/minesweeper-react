@@ -1,5 +1,7 @@
 import { createAsyncThunk } from '@reduxjs/toolkit'
-import { createNewGame, GameState } from '../lib/utils'
+
+import { createNewGame, GameState } from 'lib/utils'
+
 import { setGameStateSuccess, setSpotMapSuccess } from './game.store'
 
 export const createGame = createAsyncThunk('game/createGame', async (payload, { dispatch }) => {

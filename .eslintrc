@@ -1,13 +1,7 @@
 {
-  "extends": "next",
+  "extends": ["react-app"],
   "parser": "@typescript-eslint/parser",
-  "plugins": [
-    "jsx-a11y",
-    "sort-keys-fix",
-    "typescript-sort-keys",
-    "sort-destructure-keys",
-    "import"
-  ],
+  "plugins": ["jsx-a11y", "sort-keys-fix", "typescript-sort-keys", "sort-destructure-keys", "import"],
   "rules": {
     "import/no-anonymous-default-export": "error",
     "import/no-unresolved": "error",
@@ -19,15 +13,7 @@
           "caseInsensitive": true,
           "order": "asc"
         },
-        "groups": [
-          "builtin",
-          "external",
-          "internal",
-          "parent",
-          "object",
-          "index",
-          "sibling"
-        ],
+        "groups": ["builtin", "external", "internal", "parent", "object", "index", "sibling"],
         "newlines-between": "always"
       }
     ],
