@@ -1,7 +1,7 @@
 import React, { useMemo } from 'react'
 import Spot from './Spot'
 import { useSelector } from 'react-redux'
-import { getSpotMapSelector } from '../store/game.selectors'
+import { getSpotMapSelector } from 'store/game.selectors'
 
 const Field: React.VFC = () => {
   const spotMap = useSelector(getSpotMapSelector)

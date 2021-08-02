@@ -1,9 +1,9 @@
 import React, { useCallback, useMemo, useState } from 'react'
-import { SpotData } from '../lib/utils'
+import { SpotData } from 'lib/utils'
 import { useDispatch, useSelector } from 'react-redux'
-import { getGameStateSelector } from '../store/game.selectors'
-import { AppDispatch } from '../index'
-import { setGameState } from '../store/game.actions'
+import { getGameStateSelector } from 'store/game.selectors'
+import { AppDispatch } from 'index'
+import { setGameState } from 'store/game.actions'
 
 const Spot: React.VFC<{ data: SpotData }> = ({ data }) => {
   const dispatch = useDispatch() as AppDispatch
