@@ -15,19 +15,52 @@ export function createNewGame(columns: number, rows: number, mines: number) {
       i--
     }
   }
-  return minesMap.map((row, y) =>
-    row.map((cell, x) => {
-      return {
-        column: x,
-        hasBomb: cell,
-        row: y,
-        state: 'hidden',
-      }
-    })
+  const spotMap = minesMap.map((row, y) =>
+    row.map((cell, x) => ({
+      column: x,
+      hasBomb: cell,
+      row: y,
+      state: 'hidden',
+    })),
   ) as SpotMap
+
+  return spotMap.map((row) =>
+    row.map((spot) => {
+      const newSpot = { ...spot }
+      newSpot.nextSpots = getNearSpots(newSpot.column, newSpot.row, spotMap)
+      newSpot.nextBombCount = newSpot.nextSpots.filter(
+        (spot) => spot.hasBomb,
+      ).length
+      return newSpot
+    }),
+  )
 }
 
-export function countMines(minesMap: boolean[][], x: number, y: number, columns: number, rows: number) {
+function getNearSpots(x: number, y: number, spotMap: SpotMap): SpotData[] {
+  const findByCoordinates = (x: number, y: number) => {
+    if (x < 0 || x > spotMap[0].length - 1) return null
+    if (y < 0 || y > spotMap.length - 1) return null
+    return spotMap[y][x]
+  }
+  return [
+    findByCoordinates(x - 1, y - 1),
+    findByCoordinates(x, y - 1),
+    findByCoordinates(x + 1, y - 1),
+    findByCoordinates(x - 1, y),
+    findByCoordinates(x + 1, y),
+    findByCoordinates(x - 1, y + 1),
+    findByCoordinates(x, y + 1),
+    findByCoordinates(x + 1, y + 1),
+  ].filter((spot) => spot != null) as SpotData[]
+}
+
+export function countMines(
+  minesMap: boolean[][],
+  x: number,
+  y: number,
+  columns: number,
+  rows: number,
+) {
   if (!minesMap) return 0
   let n = 0
   if (y > 0) {
@@ -57,12 +90,42 @@ export function countMines(minesMap: boolean[][], x: number, y: number, columns:
   return n
 }
 
-export type SpotMap = SpotData[][]
-export interface SpotData {
-  column: number
-  hasBomb: boolean
-  row: number
-  state: SpotState
+export function markSpotClicked(payload: SpotData, originalSpotMap: SpotMap) {
+  const spotMap = [...originalSpotMap]
+  const spot = { ...spotMap[payload.row][payload.column] }
+  spot.state = 'clicked'
+
+  const spotRow = [...spotMap[payload.row]]
+  spotRow.splice(payload.column, 1, spot)
+  spotMap.splice(payload.row, 1, spotRow)
+
+  return spotMap
 }
-export type SpotState = 'hidden' | 'empty' | 'showBomb' | 'firedBomb' | 'flag'
-export type GameState = 'running' | 'suspended' | 'ended' | 'reset'
+
+export function clearNearbySpots(payload: SpotData, spotMap: SpotMap) {
+  payload.nextSpots.forEach((spotData) => {
+    const spot = spotMap[spotData.row][spotData.column]
+    if (!spot.hasBomb && spot.state === 'hidden') {
+      spotMap = markSpotClicked(spot, spotMap)
+      if (spot.nextBombCount === 0) {
+        spotMap = clearNearbySpots(spot, spotMap)
+      }
+    }
+  })
+
+  return spotMap
+}
+
+export type SpotMap = SpotData[][];
+
+export interface SpotData {
+  column: number;
+  hasBomb: boolean;
+  nextBombCount: number;
+  nextSpots: SpotData[];
+  row: number;
+  state: SpotState;
+}
+
+export type SpotState = 'hidden' | 'clicked' | 'flagged';
+export type GameState = 'running' | 'suspended' | 'ended' | 'reset';

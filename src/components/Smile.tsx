@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import React, { useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 
 import { AppDispatch } from 'index'
@@ -11,25 +11,23 @@ const Smile: React.VFC = () => {
   const gameState = useSelector(getGameStateSelector)
 
   const [className, setClassName] = useState('')
-  console.log(gameState, className)
-  useEffect(() => {
+
+  const getClassName = () => {
     switch (gameState) {
       case 'suspended':
-        setClassName('smile_o')
-        break
+        return 'smile_o'
       case 'ended':
-        setClassName('smile_x')
-        break
+        return 'smile_x'
       default:
-        setClassName('')
-        break
+        return ''
     }
-    console.log('useEffect')
-  }, [gameState])
+  }
+
+  const smileClassName = [getClassName(), className].join(' ')
 
   return (
     <div
-      className={className}
+      className={smileClassName}
       id={'smile'}
       onClick={() => dispatch(createGame())}
       onMouseDown={() => setClassName('smileDown')}

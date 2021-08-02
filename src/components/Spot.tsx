@@ -1,92 +1,73 @@
-import React, { useCallback, useMemo, useState } from 'react'
-import { useDispatch, useSelector } from 'react-redux'
+import React, { useCallback, useEffect, useMemo, useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
 
-import { AppDispatch } from 'index'
-import { SpotData } from 'lib/utils'
-import { setGameState } from 'store/game.actions'
-import { getGameStateSelector } from 'store/game.selectors'
+import { AppDispatch } from "index";
+import { SpotData } from "lib/utils";
+import { clickSpot, endSuspend, startSuspend } from "store/game.actions";
+import { getGameStateSelector } from "store/game.selectors";
 
 const Spot: React.VFC<SpotData> = (data) => {
-  const dispatch = useDispatch() as AppDispatch
+  const dispatch = useDispatch() as AppDispatch;
 
-  const gameState = useSelector(getGameStateSelector)
-  const [className, setClassName] = useState<string[]>([])
-  //const isRunning = gameState === 'running' || gameState === 'suspended'
+  const gameState = useSelector(getGameStateSelector);
+  const [className, setClassName] = useState<string[]>([]);
 
-  /*useEffect(() => {
-    switch (gameState) {
-      case 'ended':
-        if (!isValid) return
-        if (
-          !className.filter((cn) => cn === 'clicked').length &&
-          !className.filter((cn) => cn === 'flag').length &&
-          hasBomb
-        ) {
-          setClassName(['flower'])
-          setIsValid(false)
+  useEffect(() => {
+    setClassName([]);
+  }, [gameState === "ended"]);
+
+  const getClassName = () => {
+    const getClassNameArray = () => {
+      if (data.state == "clicked") {
+        if (data.hasBomb) {
+          return [...className, "flower_red"];
+        } else {
+          const cn = ["empty"];
+          if (data.nextBombCount > 0) {
+            cn.push("count_" + data.nextBombCount);
+          }
+          return [...className, ...cn];
         }
-        if (!!className.filter((cn) => cn === 'flag').length && !hasBomb) {
-          setClassName(['flower_no'])
-          setIsValid(false)
+      } else {
+        if (gameState === "ended" && data.hasBomb) {
+          return ["flower"];
         }
-        break
-      case 'reset':
-        setClassName([])
-        setIsValid(true)
-        break
-    }
-  }, [className, hasBomb, isRunning, isValid])*/
+        return className;
+      }
+    };
+    return getClassNameArray().join(" ");
+  };
 
   const { leftSuspendEnd, leftSuspendStart } = useCallback(
-    () =>
-      gameState !== 'ended'
-        ? {
-            leftSuspendEnd: (onlyIfSuspended: boolean) => {
-              if (onlyIfSuspended && gameState !== 'suspended') return
-              if (!!className.filter((cn) => cn === 'clicked' || cn === 'flag').length) return
-              dispatch(setGameState('running'))
-              setClassName([])
-            },
-            leftSuspendStart: () => {
-              if (!!className.filter((cn) => cn === 'clicked' || cn === 'flag').length) return
-              dispatch(setGameState('suspended'))
-              setClassName(['empty'])
-            },
-            onClick: () => {
-              if (gameState !== 'running') dispatch(setGameState('running'))
-              setClassName(['clicked'])
-            },
-            /*if (hasBomb) {
-            setIsValid(false)
-            setClassName([...className, 'flower_red'])
-            setGameState('ended')
-          } else {
-            setIsValid(false)
-            const newClasses = ['empty']
-            minesCount > 0 && newClasses.push(`count_${minesCount}`)
-            setClassName([...className, ...newClasses])
-          }*/
-          }
-        : {
-            leftSuspendEnd: () => {},
-            leftSuspendStart: () => {},
-            onClick: () => {},
-          },
+    () => ({
+      leftSuspendEnd: () => {
+        if (gameState !== "suspended") return;
+        dispatch(endSuspend(data)).then(
+          (data) => data.payload && setClassName([])
+        );
+      },
+      leftSuspendStart: () => {
+        dispatch(startSuspend(data)).then(
+          (data) => data.payload && setClassName(["empty"])
+        );
+      },
+    }),
     [className, dispatch, gameState]
-  )()
+  )();
+
+  const tdClassName = getClassName();
 
   return useMemo(() => {
-    console.log('render')
     return (
       <td
-        className={className.join(' ')}
+        className={tdClassName}
         onMouseDown={leftSuspendStart}
-        onMouseOut={() => leftSuspendEnd(true)}
-        onMouseUp={() => leftSuspendEnd(false)}
-        //onClick={onClick}
+        onMouseOut={leftSuspendEnd}
+        onMouseUp={leftSuspendEnd}
+        onClick={() => dispatch(clickSpot(data))}
       />
-    )
-  }, [className, leftSuspendStart, leftSuspendEnd])
-}
+    );
+  }, [className, leftSuspendStart, leftSuspendEnd]);
+};
 
-export default Spot
+export default Spot;
