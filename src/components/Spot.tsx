@@ -1,8 +1,8 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react'
 import { useSelector } from 'react-redux'
 
-import { useAppDispatch } from 'lib/useAppDispatch'
 import { SpotData } from 'lib/models'
+import { useAppDispatch } from 'lib/useAppDispatch'
 import { clickSpot, endSuspend, startSuspend, toggleFlag } from 'store/game.actions'
 import { getGameStateSelector } from 'store/game.selectors'
 

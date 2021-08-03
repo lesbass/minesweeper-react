@@ -3,8 +3,7 @@ import { createAsyncThunk } from '@reduxjs/toolkit'
 import { store } from 'index'
 import { GameState, SpotData } from 'lib/models'
 import { clearNearbySpots, createNewGame, markSpotClicked, toggleSpotFlag } from 'lib/utils'
-
-import { setGameStateSuccess, setSpotMapSuccess, setStartGameSuccess } from './game.store'
+import { setGameStateSuccess, setSpotMapSuccess, setStartGameSuccess } from 'store/game.store'
 
 const gameStore = () => store.getState().game
 
