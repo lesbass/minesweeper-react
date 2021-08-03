@@ -12,9 +12,11 @@ const Spot: React.VFC<SpotData> = (data) => {
   const gameState = useSelector(getGameStateSelector)
   const [className, setClassName] = useState<string[]>([])
 
+  const isGameEnded = gameState === 'ended'
+
   useEffect(() => {
     setClassName([])
-  }, [gameState === 'ended'])
+  }, [isGameEnded])
 
   const getClassName = () => {
     const getClassNameArray = () => {
@@ -30,12 +32,9 @@ const Spot: React.VFC<SpotData> = (data) => {
         }
       } else {
         if (gameState === 'ended') {
-          switch (data.state) {
-            case 'flagged':
-              return [data.hasBomb ? 'flag' : 'flag_no']
-            default:
-              return [data.hasBomb ? 'flower' : '']
-          }
+          return data.state === "flagged"
+            ? [data.hasBomb ? "flag" : "flag_no"]
+            : [data.hasBomb ? "flower" : ""];
         }
         if (data.state === 'flagged') {
           return ['flag']

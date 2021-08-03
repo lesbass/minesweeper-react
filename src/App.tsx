@@ -10,7 +10,7 @@ const App: React.VFC = () => {
 
   useEffect(() => {
     dispatch(createGame())
-  }, [])
+  }, [dispatch])
 
   return (
     <>
