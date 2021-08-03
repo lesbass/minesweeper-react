@@ -1,9 +1,11 @@
 import { range } from 'lodash'
 
+import { SpotData, SpotMap } from 'lib/models'
+
 export function createNewGame(columns: number, rows: number, mines: number) {
   let minesMap = range(0, rows).map(() => range(0, columns).map(() => false))
 
-  for (let i = 0; i < mines; i++) {
+  for (let i = 0; i < mines; ) {
     const x = Math.round(Math.random() * (columns - 1))
     const y = Math.round(Math.random() * (rows - 1))
 
@@ -11,8 +13,7 @@ export function createNewGame(columns: number, rows: number, mines: number) {
 
     if (!minesMap[y][x]) {
       minesMap[y][x] = true
-    } else {
-      i--
+      i++
     }
   }
   const spotMap = minesMap.map((row, y) =>
@@ -28,17 +29,17 @@ export function createNewGame(columns: number, rows: number, mines: number) {
     row.map((spot) => {
       const newSpot = { ...spot }
       newSpot.nextSpots = getNearSpots(newSpot.column, newSpot.row, spotMap)
-      newSpot.nextBombCount = newSpot.nextSpots.filter((spot) => spot.hasBomb).length
+      newSpot.nextBombCount = newSpot.nextSpots.filter((data) => data.hasBomb).length
       return newSpot
     })
   )
 }
 
 function getNearSpots(x: number, y: number, spotMap: SpotMap): SpotData[] {
-  const findByCoordinates = (x: number, y: number) => {
-    if (x < 0 || x > spotMap[0].length - 1) return null
-    if (y < 0 || y > spotMap.length - 1) return null
-    return spotMap[y][x]
+  const findByCoordinates = (col: number, row: number) => {
+    if (col < 0 || col > spotMap[0].length - 1) return null
+    if (row < 0 || row > spotMap.length - 1) return null
+    return spotMap[row][col]
   }
   return [
     findByCoordinates(x - 1, y - 1),
@@ -119,17 +120,3 @@ export function clearNearbySpots(payload: SpotData, spotMap: SpotMap) {
 
   return spotMap
 }
-
-export type SpotMap = SpotData[][]
-
-export interface SpotData {
-  column: number
-  hasBomb: boolean
-  nextBombCount: number
-  nextSpots: SpotData[]
-  row: number
-  state: SpotState
-}
-
-export type SpotState = 'hidden' | 'clicked' | 'flagged'
-export type GameState = 'running' | 'suspended' | 'ended' | 'reset'

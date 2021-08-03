@@ -2,7 +2,7 @@ import React, { useCallback, useEffect, useMemo, useState } from 'react'
 import { useSelector } from 'react-redux'
 
 import { useAppDispatch } from 'lib/useAppDispatch'
-import { SpotData } from 'lib/utils'
+import { SpotData } from 'lib/models'
 import { clickSpot, endSuspend, startSuspend, toggleFlag } from 'store/game.actions'
 import { getGameStateSelector } from 'store/game.selectors'
 
@@ -29,10 +29,16 @@ const Spot: React.VFC<SpotData> = (data) => {
           return [...className, ...cn]
         }
       } else {
+        if (gameState === 'ended') {
+          switch (data.state) {
+            case 'flagged':
+              return [data.hasBomb ? 'flag' : 'flag_no']
+            default:
+              return [data.hasBomb ? 'flower' : '']
+          }
+        }
         if (data.state === 'flagged') {
           return ['flag']
-        } else if (gameState === 'ended' && data.hasBomb) {
-          return ['flower']
         }
         return className
       }

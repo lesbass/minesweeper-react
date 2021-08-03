@@ -1,9 +1,12 @@
 import { createAsyncThunk } from '@reduxjs/toolkit'
 
 import { store } from 'index'
-import { clearNearbySpots, createNewGame, GameState, markSpotClicked, SpotData, toggleSpotFlag } from 'lib/utils'
+import { GameState, SpotData } from 'lib/models'
+import { clearNearbySpots, createNewGame, markSpotClicked, toggleSpotFlag } from 'lib/utils'
 
 import { setGameStateSuccess, setSpotMapSuccess, setStartGameSuccess } from './game.store'
+
+const gameStore = () => store.getState().game
 
 export const createGame = createAsyncThunk('game/createGame', async (payload, { dispatch }) => {
   const rows = 16
@@ -24,7 +27,7 @@ export const setGameState = createAsyncThunk<GameState, Partial<GameState>>(
 )
 
 export const startSuspend = createAsyncThunk<boolean, SpotData>('game/startSuspend', async (payload, { dispatch }) => {
-  const gameState = store.getState().game.gameState
+  const gameState = gameStore().gameState
   if (payload.state === 'hidden' && gameState === 'running') {
     dispatch(setGameStateSuccess('suspended'))
     return true
@@ -33,7 +36,7 @@ export const startSuspend = createAsyncThunk<boolean, SpotData>('game/startSuspe
 })
 
 export const endSuspend = createAsyncThunk<boolean, SpotData>('game/endSuspend', async (payload, { dispatch }) => {
-  const gameState = store.getState().game.gameState
+  const gameState = gameStore().gameState
   if (payload.state === 'hidden' && gameState === 'suspended') {
     dispatch(setGameStateSuccess('running'))
     return true
@@ -42,25 +45,25 @@ export const endSuspend = createAsyncThunk<boolean, SpotData>('game/endSuspend',
 })
 
 export const toggleFlag = createAsyncThunk<void, SpotData>('game/toggleFlag', async (payload, { dispatch }) => {
-  const gameState = store.getState().game.gameState
+  const gameState = gameStore().gameState
   if ((payload.state === 'hidden' || payload.state === 'flagged') && gameState !== 'ended') {
-    const spotMap = toggleSpotFlag(payload, store.getState().game.spotMap)
+    const spotMap = toggleSpotFlag(payload, gameStore().spotMap)
     dispatch(setSpotMapSuccess(spotMap))
   }
 })
 
 export const clearNextSpots = createAsyncThunk<void, SpotData>('game/clearNextSpots', async (payload, { dispatch }) => {
-  const gameState = store.getState().game.gameState
+  const gameState = gameStore().gameState
   if (gameState === 'running' && payload.nextBombCount === 0) {
-    const spotMap = clearNearbySpots(payload, [...store.getState().game.spotMap])
+    const spotMap = clearNearbySpots(payload, [...gameStore().spotMap])
     dispatch(setSpotMapSuccess(spotMap))
   }
 })
 
 export const clickSpot = createAsyncThunk<void, SpotData>('game/clickSpot', async (payload, { dispatch }) => {
-  const gameState = store.getState().game.gameState
+  const gameState = gameStore().gameState
   if (payload.state === 'hidden' && gameState === 'running') {
-    const spotMap = markSpotClicked(payload, store.getState().game.spotMap)
+    const spotMap = markSpotClicked(payload, gameStore().spotMap)
     dispatch(setSpotMapSuccess(spotMap))
 
     if (payload.hasBomb) {

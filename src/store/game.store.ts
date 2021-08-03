@@ -1,6 +1,6 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit'
 
-import { GameState, SpotMap } from 'lib/utils'
+import { GameState, SpotMap } from 'lib/models'
 
 export const GameStore = createSlice({
   initialState: {
