@@ -25,8 +25,6 @@ export const store = configureStore({
   reducer: rootReducer, // se è in produzione non include i devtools
 });
 
-export type AppDispatch = typeof store.dispatch; // server per fare THEN e CATCH quando si fa la dispatch vedi addProduct
-
 ReactDOM.render(
   <Provider store={store}>
     <React.StrictMode>

@@ -11,19 +11,17 @@ const Field: React.VFC = () => {
   return useMemo(
     () =>
       !spotMap.length ? (
-        <div style={{ padding: "100px", textAlign: "center" }}>
-          {"Avvio in corso..."}
-        </div>
+        <div style={{ padding: "100px", textAlign: "center" }}>Avvio in corso... </div>
       ) : (
         <table cellPadding="0" cellSpacing="0" id="mines">
           <tbody>
-            {spotMap.map((row, i) => (
-              <tr key={i}>
-                {row.map((spot, j) => {
-                  return <Spot key={`spot-${j}`} {...spot} />;
-                })}
-              </tr>
-            ))}
+          {spotMap.map((row, i) => (
+            <tr key={i}>
+              {row.map((spot, j) => {
+                return <Spot key={`spot-${j}`} {...spot} />;
+              })}
+            </tr>
+          ))}
           </tbody>
         </table>
       ),

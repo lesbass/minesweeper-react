@@ -1,27 +1,27 @@
-import React, { useEffect } from 'react'
-import { useDispatch } from 'react-redux'
+import React, { useEffect } from "react";
 
-import Field from 'components/Field'
-import Smile from 'components/Smile'
-import { AppDispatch } from 'index'
-import { createGame } from 'store/game.actions'
+import Field from "components/Field";
+import Smile from "components/Smile";
+import { useAppDispatch } from "lib/useAppDispatch";
+import { createGame } from "store/game.actions";
 
 const App: React.VFC = () => {
-  const dispatch = useDispatch() as AppDispatch
+  const dispatch = useAppDispatch();
+
   useEffect(() => {
-    dispatch(createGame())
-  }, [dispatch])
+    dispatch(createGame());
+  }, []);
 
   return (
     <>
-      <div id='console'>
-        <div id='menu'>
+      <div id="console">
+        <div id="menu">
           <Smile />
         </div>
         <Field />
       </div>
     </>
-  )
-}
+  );
+};
 
-export default App
+export default App;
