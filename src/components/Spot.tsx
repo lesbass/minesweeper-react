@@ -1,73 +1,80 @@
-import React, { useCallback, useEffect, useMemo, useState } from "react";
-import { useSelector } from "react-redux";
+import React, { useCallback, useEffect, useMemo, useState } from 'react'
+import { useSelector } from 'react-redux'
 
-import { useAppDispatch } from "lib/useAppDispatch";
-import { SpotData } from "lib/utils";
-import { clickSpot, endSuspend, startSuspend } from "store/game.actions";
-import { getGameStateSelector } from "store/game.selectors";
+import { useAppDispatch } from 'lib/useAppDispatch'
+import { SpotData } from 'lib/utils'
+import { clickSpot, endSuspend, startSuspend, toggleFlag } from 'store/game.actions'
+import { getGameStateSelector } from 'store/game.selectors'
 
 const Spot: React.VFC<SpotData> = (data) => {
-  const dispatch = useAppDispatch();
+  const dispatch = useAppDispatch()
 
-  const gameState = useSelector(getGameStateSelector);
-  const [className, setClassName] = useState<string[]>([]);
+  const gameState = useSelector(getGameStateSelector)
+  const [className, setClassName] = useState<string[]>([])
 
   useEffect(() => {
-    setClassName([]);
-  }, [gameState === "ended"]);
+    setClassName([])
+  }, [gameState === 'ended'])
 
   const getClassName = () => {
     const getClassNameArray = () => {
-      if (data.state == "clicked") {
+      if (data.state === 'clicked') {
         if (data.hasBomb) {
-          return [...className, "flower_red"];
+          return [...className, 'flower_red']
         } else {
-          const cn = ["empty"];
+          const cn = ['empty']
           if (data.nextBombCount > 0) {
-            cn.push("count_" + data.nextBombCount);
+            cn.push('count_' + data.nextBombCount)
           }
-          return [...className, ...cn];
+          return [...className, ...cn]
         }
       } else {
-        if (gameState === "ended" && data.hasBomb) {
-          return ["flower"];
+        if (data.state === 'flagged') {
+          return ['flag']
+        } else if (gameState === 'ended' && data.hasBomb) {
+          return ['flower']
         }
-        return className;
+        return className
       }
-    };
-    return getClassNameArray().join(" ");
-  };
+    }
+    return getClassNameArray().join(' ')
+  }
 
-  const { leftSuspendEnd, leftSuspendStart } = useCallback(
+  const { leftClick, leftSuspendEnd, leftSuspendStart, rightClick } = useCallback(
     () => ({
-      leftSuspendEnd: () => {
-        if (gameState !== "suspended") return;
-        dispatch(endSuspend(data)).then(
-          (data) => data.payload && setClassName([])
-        );
+      leftClick: () => {
+        dispatch(clickSpot(data))
       },
-      leftSuspendStart: () => {
-        dispatch(startSuspend(data)).then(
-          (data) => data.payload && setClassName(["empty"])
-        );
-      }
+      leftSuspendEnd: () => {
+        if (gameState !== 'suspended') return
+        dispatch(endSuspend(data)).then((item) => item.payload && setClassName([]))
+      },
+      leftSuspendStart: (e: React.MouseEvent<HTMLTableDataCellElement, MouseEvent>) => {
+        if (e.button === 2) return
+        dispatch(startSuspend(data)).then((item) => item.payload && setClassName(['empty']))
+      },
+      rightClick: (e: React.MouseEvent<HTMLTableDataCellElement, MouseEvent>) => {
+        e.preventDefault()
+        dispatch(toggleFlag(data))
+      },
     }),
-    [className, dispatch, gameState]
-  )();
+    [data, dispatch, gameState]
+  )()
 
-  const tdClassName = getClassName();
+  const tdClassName = getClassName()
 
   return useMemo(() => {
     return (
       <td
         className={tdClassName}
-        onClick={() => dispatch(clickSpot(data))}
+        onClick={leftClick}
+        onContextMenu={rightClick}
         onMouseDown={leftSuspendStart}
         onMouseOut={leftSuspendEnd}
         onMouseUp={leftSuspendEnd}
       />
-    );
-  }, [className, leftSuspendStart, leftSuspendEnd]);
-};
+    )
+  }, [tdClassName, leftClick, rightClick, leftSuspendStart, leftSuspendEnd])
+}
 
-export default Spot;
+export default Spot

@@ -21,18 +21,16 @@ export function createNewGame(columns: number, rows: number, mines: number) {
       hasBomb: cell,
       row: y,
       state: 'hidden',
-    })),
+    }))
   ) as SpotMap
 
   return spotMap.map((row) =>
     row.map((spot) => {
       const newSpot = { ...spot }
       newSpot.nextSpots = getNearSpots(newSpot.column, newSpot.row, spotMap)
-      newSpot.nextBombCount = newSpot.nextSpots.filter(
-        (spot) => spot.hasBomb,
-      ).length
+      newSpot.nextBombCount = newSpot.nextSpots.filter((spot) => spot.hasBomb).length
       return newSpot
-    }),
+    })
   )
 }
 
@@ -54,13 +52,7 @@ function getNearSpots(x: number, y: number, spotMap: SpotMap): SpotData[] {
   ].filter((spot) => spot != null) as SpotData[]
 }
 
-export function countMines(
-  minesMap: boolean[][],
-  x: number,
-  y: number,
-  columns: number,
-  rows: number,
-) {
+export function countMines(minesMap: boolean[][], x: number, y: number, columns: number, rows: number) {
   if (!minesMap) return 0
   let n = 0
   if (y > 0) {
@@ -102,6 +94,18 @@ export function markSpotClicked(payload: SpotData, originalSpotMap: SpotMap) {
   return spotMap
 }
 
+export function toggleSpotFlag(payload: SpotData, originalSpotMap: SpotMap) {
+  const spotMap = [...originalSpotMap]
+  const spot = { ...spotMap[payload.row][payload.column] }
+  spot.state = spot.state === 'flagged' ? 'hidden' : 'flagged'
+  console.log(spot.state)
+  const spotRow = [...spotMap[payload.row]]
+  spotRow.splice(payload.column, 1, spot)
+  spotMap.splice(payload.row, 1, spotRow)
+
+  return spotMap
+}
+
 export function clearNearbySpots(payload: SpotData, spotMap: SpotMap) {
   payload.nextSpots.forEach((spotData) => {
     const spot = spotMap[spotData.row][spotData.column]
@@ -116,16 +120,16 @@ export function clearNearbySpots(payload: SpotData, spotMap: SpotMap) {
   return spotMap
 }
 
-export type SpotMap = SpotData[][];
+export type SpotMap = SpotData[][]
 
 export interface SpotData {
-  column: number;
-  hasBomb: boolean;
-  nextBombCount: number;
-  nextSpots: SpotData[];
-  row: number;
-  state: SpotState;
+  column: number
+  hasBomb: boolean
+  nextBombCount: number
+  nextSpots: SpotData[]
+  row: number
+  state: SpotState
 }
 
-export type SpotState = 'hidden' | 'clicked' | 'flagged';
-export type GameState = 'running' | 'suspended' | 'ended' | 'reset';
+export type SpotState = 'hidden' | 'clicked' | 'flagged'
+export type GameState = 'running' | 'suspended' | 'ended' | 'reset'

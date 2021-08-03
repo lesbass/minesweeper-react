@@ -1,16 +1,16 @@
-import React, { useEffect } from "react";
+import React, { useEffect } from 'react'
 
-import Field from "components/Field";
-import Smile from "components/Smile";
-import { useAppDispatch } from "lib/useAppDispatch";
-import { createGame } from "store/game.actions";
+import Field from 'components/Field'
+import Smile from 'components/Smile'
+import { useAppDispatch } from 'lib/useAppDispatch'
+import { createGame } from 'store/game.actions'
 
 const App: React.VFC = () => {
-  const dispatch = useAppDispatch();
+  const dispatch = useAppDispatch()
 
   useEffect(() => {
-    dispatch(createGame());
-  }, []);
+    dispatch(createGame())
+  }, [])
 
   return (
     <>
@@ -21,7 +21,7 @@ const App: React.VFC = () => {
         <Field />
       </div>
     </>
-  );
-};
+  )
+}
 
-export default App;
+export default App

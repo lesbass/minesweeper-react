@@ -1,40 +1,40 @@
-import React, { useState } from "react";
-import { useSelector } from "react-redux";
+import React, { useState } from 'react'
+import { useSelector } from 'react-redux'
 
-import { useAppDispatch } from "lib/useAppDispatch";
-import { createGame } from "store/game.actions";
-import { getGameStateSelector } from "store/game.selectors";
+import { useAppDispatch } from 'lib/useAppDispatch'
+import { createGame } from 'store/game.actions'
+import { getGameStateSelector } from 'store/game.selectors'
 
 const Smile: React.VFC = () => {
-  const dispatch = useAppDispatch();
+  const dispatch = useAppDispatch()
 
-  const gameState = useSelector(getGameStateSelector);
+  const gameState = useSelector(getGameStateSelector)
 
-  const [className, setClassName] = useState("");
+  const [className, setClassName] = useState('')
 
   const getClassName = () => {
     switch (gameState) {
-      case "suspended":
-        return "smile_o";
-      case "ended":
-        return "smile_x";
+      case 'suspended':
+        return 'smile_o'
+      case 'ended':
+        return 'smile_x'
       default:
-        return "";
+        return ''
     }
-  };
+  }
 
-  const smileClassName = [getClassName(), className].join(" ");
+  const smileClassName = [getClassName(), className].join(' ')
 
   return (
     <div
       className={smileClassName}
-      id={"smile"}
+      id={'smile'}
       onClick={() => dispatch(createGame())}
-      onMouseDown={() => setClassName("smileDown")}
-      onMouseOut={() => setClassName("")}
-      onMouseUp={() => setClassName("")}
+      onMouseDown={() => setClassName('smileDown')}
+      onMouseOut={() => setClassName('')}
+      onMouseUp={() => setClassName('')}
     />
-  );
-};
+  )
+}
 
-export default Smile;
+export default Smile
